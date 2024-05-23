@@ -1,4 +1,11 @@
 import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_apikey,
@@ -12,4 +19,32 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export default app;
+const auth = getAuth();
+
+const googleProvider = new GoogleAuthProvider();
+
+const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    console.log(user);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const signOutUser = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error(error);
+  }
+};
+export {
+  app,
+  auth,
+  signInWithGoogle,
+  signOutUser,
+  onAuthStateChanged,
+  getAuth,
+};
