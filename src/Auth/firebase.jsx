@@ -6,6 +6,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_apikey,
@@ -40,6 +41,8 @@ const signOutUser = async () => {
     console.error(error);
   }
 };
+
+const db = getFirestore(app);
 export {
   app,
   auth,
@@ -47,4 +50,5 @@ export {
   signOutUser,
   onAuthStateChanged,
   getAuth,
+  db,
 };
