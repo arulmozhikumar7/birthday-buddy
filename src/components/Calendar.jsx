@@ -21,50 +21,14 @@ import {
 } from "date-fns";
 import { Fragment, useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
-
-const birthdays = [
-  {
-    id: 1,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    Date: "2023-05-11",
-  },
-  {
-    id: 2,
-    name: "Michael Foster",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    Date: "2023-05-20",
-  },
-  {
-    id: 3,
-    name: "Dries Vincent",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    Date: "2023-05-20",
-  },
-  {
-    id: 4,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    Date: "2023-06-09",
-  },
-  {
-    id: 5,
-    name: "Michael Foster",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    Date: "2023-05-13",
-  },
-];
+import { useUser } from "../contexts/store";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Calendar() {
+  const { birthdays } = useUser();
   let today = startOfToday();
   let [selectedDay, setSelectedDay] = useState(today);
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
@@ -96,7 +60,7 @@ export default function Calendar() {
   }
 
   let selectedDayBirthdays = birthdays.filter((birthday) => {
-    const birthdayDate = parseISO(birthday.Date);
+    const birthdayDate = parseISO(birthday.date);
     return (
       birthdayDate.getFullYear() <= selectedDay.getFullYear() &&
       birthdayDate.getMonth() === selectedDay.getMonth() &&
@@ -197,7 +161,7 @@ export default function Calendar() {
 
                   <div className="w-1 h-1 mx-auto mt-1">
                     {birthdays.some((birthday) => {
-                      const birthdayDate = parseISO(birthday.Date);
+                      const birthdayDate = parseISO(birthday.date);
                       return (
                         birthdayDate.getFullYear() <= day.getFullYear() &&
                         birthdayDate.getMonth() === day.getMonth() &&
@@ -225,7 +189,7 @@ export default function Calendar() {
                     <Birthday birthday={birthday} key={birthday.id} />
                   ))}
                   <li>
-                    <button className="py-2 px-4 text-black  :">
+                    <button className="px-4 py-2 text-black :">
                       <FaCirclePlus size={30} />
                     </button>
                   </li>
