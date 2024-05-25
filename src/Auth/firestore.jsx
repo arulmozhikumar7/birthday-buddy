@@ -6,7 +6,7 @@ import {
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
-const addBirthday = async (user, name, date, imageUrl = "") => {
+const addBirthday = async (user, name, date, imageUrl) => {
   try {
     if (!user) {
       throw new Error("User is not authenticated.");

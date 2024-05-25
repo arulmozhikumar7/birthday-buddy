@@ -25,11 +25,11 @@ const BirthdayForm = ({ initialData = {}, onClose }) => {
 
     setIsLoading(true);
     try {
+      let updatedImageUrl = imageUrl;
       if (imageFile) {
         const imageRef = ref(storage, `images/${imageFile.name}`);
         await uploadBytes(imageRef, imageFile);
-        const url = await getDownloadURL(imageRef);
-        setImageUrl(url);
+        updatedImageUrl = await getDownloadURL(imageRef);
       }
 
       if (initialData.id) {
@@ -38,11 +38,11 @@ const BirthdayForm = ({ initialData = {}, onClose }) => {
           initialData.id,
           name,
           date,
-          imageUrl
+          updatedImageUrl
         );
         toast.success("Birthday edited successfully");
       } else {
-        await firestore.addBirthday(user, name, date, imageUrl);
+        await firestore.addBirthday(user, name, date, updatedImageUrl);
         toast.success("Birthday added successfully");
       }
 
