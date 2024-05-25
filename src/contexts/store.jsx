@@ -5,4 +5,6 @@ export const useUser = create((set) => ({
   setUser: (user) => set({ user }),
   birthdays: [],
   setBirthdays: (birthdays) => set({ birthdays: birthdays }),
+  formModal: false,
+  setFormModal: (formModal) => set({ formModal }),
 }));
