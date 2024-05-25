@@ -5,7 +5,10 @@ import {
   FaAnglesRight,
   FaAngleLeft,
   FaAnglesLeft,
+  FaCirclePlus,
 } from "react-icons/fa6";
+import BirthdayForm from "./BirthdayForm";
+import firestore from "../Auth/firestore";
 import {
   add,
   eachDayOfInterval,
@@ -20,20 +23,19 @@ import {
   startOfToday,
 } from "date-fns";
 import { Fragment, useState } from "react";
-import { FaCirclePlus } from "react-icons/fa6";
 import { useUser } from "../contexts/store";
+import toast from "react-hot-toast";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Calendar() {
-  const { birthdays } = useUser();
+  const { birthdays, formModal, setFormModal } = useUser();
   let today = startOfToday();
   let [selectedDay, setSelectedDay] = useState(today);
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
   let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
-
   let days = eachDayOfInterval({
     start: firstDayCurrentMonth,
     end: endOfMonth(firstDayCurrentMonth),
@@ -188,18 +190,38 @@ export default function Calendar() {
                   {selectedDayBirthdays.map((birthday) => (
                     <Birthday birthday={birthday} key={birthday.id} />
                   ))}
-                  <li>
-                    <button className="px-4 py-2 text-black :">
-                      <FaCirclePlus size={30} />
-                    </button>
-                  </li>
+
+                  <button
+                    className="px-4 py-2 text-black"
+                    type="button"
+                    onClick={() => setFormModal(true)}
+                  >
+                    <FaCirclePlus size={30} />
+                  </button>
+
+                  {formModal && (
+                    <div className="max-w-2xl mx-auto">
+                      <div className="fixed inset-0 bg-black bg-opacity-50"></div>
+                      <BirthdayForm />
+                    </div>
+                  )}
                 </>
               ) : (
                 <li>
                   <p>No birthdays for today.</p>
-                  <button className="py-2 text-black ">
+                  <button
+                    className="py-2 text-black"
+                    type="button"
+                    onClick={() => setFormModal(true)}
+                  >
                     <FaCirclePlus size={30} />
                   </button>
+                  {formModal && (
+                    <div className="max-w-2xl mx-auto">
+                      <div className="fixed inset-0 bg-black bg-opacity-50"></div>
+                      <BirthdayForm />
+                    </div>
+                  )}
                 </li>
               )}
             </ol>
@@ -211,6 +233,17 @@ export default function Calendar() {
 }
 
 function Birthday({ birthday }) {
+  const { user, setBirthdays, birthdays } = useUser();
+
+  const handleDelete = async ({ user, birthdayId }) => {
+    try {
+      await firestore.deleteBirthday(user, birthdayId);
+      setBirthdays(birthdays.filter((b) => b.id !== birthdayId));
+      toast.success("Birthday deleted successfully");
+    } catch (err) {
+      console.error("Error deleting birthday: ", err);
+    }
+  };
   return (
     <li className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100">
       <img
@@ -221,6 +254,7 @@ function Birthday({ birthday }) {
       <div className="flex-auto">
         <p className="text-gray-900">{birthday.name}</p>
       </div>
+
       <Menu
         as="div"
         className="relative opacity-0 focus-within:opacity-100 group-hover:opacity-100"
@@ -253,6 +287,20 @@ function Birthday({ birthday }) {
                     )}
                   >
                     Edit
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => handleDelete({ user, birthdayId: birthday.id })}
+              >
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
+                    )}
+                  >
+                    delete
                   </a>
                 )}
               </Menu.Item>
