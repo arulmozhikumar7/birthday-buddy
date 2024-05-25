@@ -35,6 +35,7 @@ export default function Calendar() {
   let today = startOfToday();
   let [selectedDay, setSelectedDay] = useState(today);
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
+  let [formInitialData, setFormInitialData] = useState({});
   let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
   let days = eachDayOfInterval({
     start: firstDayCurrentMonth,
@@ -69,6 +70,16 @@ export default function Calendar() {
       birthdayDate.getDate() === selectedDay.getDate()
     );
   });
+
+  const handleOpenForm = (birthday = {}) => {
+    setFormInitialData(birthday);
+    setFormModal(true);
+  };
+
+  const handleCloseForm = () => {
+    setFormModal(false);
+    setFormInitialData({});
+  };
 
   return (
     <div className="pt-16">
@@ -188,13 +199,17 @@ export default function Calendar() {
               {selectedDayBirthdays.length > 0 ? (
                 <>
                   {selectedDayBirthdays.map((birthday) => (
-                    <Birthday birthday={birthday} key={birthday.id} />
+                    <Birthday
+                      birthday={birthday}
+                      key={birthday.id}
+                      onEdit={() => handleOpenForm(birthday)}
+                    />
                   ))}
 
                   <button
                     className="px-4 py-2 text-black"
                     type="button"
-                    onClick={() => setFormModal(true)}
+                    onClick={() => handleOpenForm()}
                   >
                     <FaCirclePlus size={30} />
                   </button>
@@ -202,7 +217,10 @@ export default function Calendar() {
                   {formModal && (
                     <div className="max-w-2xl mx-auto">
                       <div className="fixed inset-0 bg-black bg-opacity-50"></div>
-                      <BirthdayForm />
+                      <BirthdayForm
+                        initialData={formInitialData}
+                        onClose={handleCloseForm}
+                      />
                     </div>
                   )}
                 </>
@@ -212,14 +230,17 @@ export default function Calendar() {
                   <button
                     className="py-2 text-black"
                     type="button"
-                    onClick={() => setFormModal(true)}
+                    onClick={() => handleOpenForm()}
                   >
                     <FaCirclePlus size={30} />
                   </button>
                   {formModal && (
                     <div className="max-w-2xl mx-auto">
                       <div className="fixed inset-0 bg-black bg-opacity-50"></div>
-                      <BirthdayForm />
+                      <BirthdayForm
+                        initialData={formInitialData}
+                        onClose={handleCloseForm}
+                      />
                     </div>
                   )}
                 </li>
@@ -232,7 +253,7 @@ export default function Calendar() {
   );
 }
 
-function Birthday({ birthday }) {
+function Birthday({ birthday, onEdit }) {
   const { user, setBirthdays, birthdays } = useUser();
 
   const handleDelete = async ({ user, birthdayId }) => {
@@ -244,6 +265,7 @@ function Birthday({ birthday }) {
       console.error("Error deleting birthday: ", err);
     }
   };
+
   return (
     <li className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100">
       <img
@@ -279,42 +301,29 @@ function Birthday({ birthday }) {
             <div className="py-1">
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    href="#"
+                  <button
+                    onClick={onEdit}
                     className={classNames(
                       active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
+                      "block w-full text-left px-4 py-2 text-sm"
                     )}
                   >
                     Edit
-                  </a>
+                  </button>
                 )}
               </Menu.Item>
               <Menu.Item
                 onClick={() => handleDelete({ user, birthdayId: birthday.id })}
               >
                 {({ active }) => (
-                  <a
+                  <button
                     className={classNames(
                       active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
+                      "block w-full text-left px-4 py-2 text-sm"
                     )}
                   >
-                    delete
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    href="#"
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
-                    )}
-                  >
-                    Cancel
-                  </a>
+                    Delete
+                  </button>
                 )}
               </Menu.Item>
             </div>
