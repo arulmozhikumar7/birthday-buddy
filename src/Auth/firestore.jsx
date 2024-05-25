@@ -1,5 +1,11 @@
 import { db } from "../Auth/firebase";
-import { collection, addDoc, doc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 const addBirthday = async (user, name, date, imageUrl = "") => {
   try {
     if (!user) {
@@ -35,4 +41,24 @@ const deleteBirthday = async (user, birthdayId) => {
   }
 };
 
-export default { addBirthday, deleteBirthday };
+const editBirthday = async (user, birthdayId, name, date, imageUrl = "") => {
+  try {
+    if (!user) {
+      throw new Error("User is not authenticated.");
+    }
+
+    const birthdayRef = doc(db, "birthdays", birthdayId);
+    await updateDoc(birthdayRef, {
+      name,
+      date,
+      imageUrl,
+    });
+
+    return "Birthday updated successfully!";
+  } catch (error) {
+    console.error("Error updating birthday: ", error);
+    throw error;
+  }
+};
+
+export default { addBirthday, deleteBirthday, editBirthday };
