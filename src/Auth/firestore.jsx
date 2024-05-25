@@ -1,6 +1,5 @@
 import { db } from "../Auth/firebase";
-import { collection, addDoc } from "firebase/firestore";
-import { getBirthdays } from "../hooks/useGetBirthdays";
+import { collection, addDoc, doc, deleteDoc } from "firebase/firestore";
 const addBirthday = async (user, name, date, imageUrl = "") => {
   try {
     if (!user) {
@@ -13,8 +12,6 @@ const addBirthday = async (user, name, date, imageUrl = "") => {
       date,
       imageUrl,
     });
-
-    await getBirthdays(user.uid);
     return "Birthday added successfully!";
   } catch (error) {
     console.error("Error adding birthday: ", error);
@@ -22,4 +19,20 @@ const addBirthday = async (user, name, date, imageUrl = "") => {
   }
 };
 
-export default addBirthday;
+const deleteBirthday = async (user, birthdayId) => {
+  try {
+    if (!user) {
+      throw new Error("User is not authenticated.");
+    }
+
+    const birthdayRef = doc(db, "birthdays", birthdayId);
+    await deleteDoc(birthdayRef);
+
+    return "Birthday deleted successfully!";
+  } catch (error) {
+    console.error("Error deleting birthday: ", error);
+    throw error;
+  }
+};
+
+export default { addBirthday, deleteBirthday };
