@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useUser } from "../contexts/store";
 import { storage } from "../Auth/firebase";
-import addBirthday from "../Auth/firestore";
+import firestore from "../Auth/firestore";
 import { getBirthdays } from "../hooks/useGetBirthdays";
 import toast from "react-hot-toast";
 const BirthdayForm = () => {
@@ -23,7 +23,7 @@ const BirthdayForm = () => {
         await uploadBytes(imageRef, imageFile);
         imageUrl = await getDownloadURL(imageRef);
       }
-      await addBirthday(user, name, date, imageUrl);
+      await firestore.addBirthday(user, name, date, imageUrl);
       toast.success("Birthday added successfully");
       setIsLoading(false);
       setFormModal(false);
